@@ -45,6 +45,11 @@ type EntitiesTaskParameters struct {
 	StringIndexType string `json:"stringIndexType,omitempty"`
 }
 
+type KeyPhraseTaskParameters struct {
+	LoggingOptOut bool   `json:"loggingOptOut,omitempty"`
+	ModelVersion  string `json:"modelVersion,omitempty"`
+}
+
 type InputError struct {
 	// Error Error encountered.
 	Error ErrorInformation `json:"error"`
@@ -142,6 +147,15 @@ type Documents struct {
 }
 
 type EntitiesResult struct {
+	// Documents Response by document
+	Documents []Documents `json:"documents"`
+	// Errors Errors by document id.
+	Errors []DocumentError `json:"errors"`
+	// ModelVersion This field indicates which model is used for scoring.
+	ModelVersion string `json:"modelVersion"`
+}
+
+type KeyPhraseResult struct {
 	// Documents Response by document
 	Documents []Documents `json:"documents"`
 	// Errors Errors by document id.

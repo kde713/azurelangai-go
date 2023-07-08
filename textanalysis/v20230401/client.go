@@ -8,12 +8,43 @@ import (
 
 type Client interface {
 	AnalyzeTextLanguageDetection(ctx context.Context, input LanguageDetectionAnalysisInput, parameters LanguageDetectionTaskParameters) (*LanguageDetectionResult, error)
+	AnalyzeTextEntityRecognition(ctx context.Context, input MultiLanguageAnalysisInput, parameters EntitiesTaskParameters) (*EntitiesResult, error)
 }
 
 var _ Client = (*client)(nil)
 
 type client struct {
 	r *resty.Client
+}
+
+func (c client) AnalyzeTextEntityRecognition(ctx context.Context, input MultiLanguageAnalysisInput, parameters EntitiesTaskParameters) (*EntitiesResult, error) {
+	body := RequestBody[MultiLanguageAnalysisInput, EntitiesTaskParameters]{
+		Kind:          "EntityRecognition",
+		AnalysisInput: input,
+		Parameters:    parameters,
+	}
+	req, err := c.r.R().
+		SetContext(ctx).
+		SetQueryParam("api-version", APIVersion).
+		SetBody(body).
+		SetResult(TaskResponse[EntitiesResult]{}).
+		SetError(ErrorResponse{}).
+		Post(APIPath)
+	if err != nil {
+		return nil, err
+	}
+	if req.IsError() {
+		errorResp := req.Error().(*ErrorResponse)
+		if errorResp == nil {
+			return nil, fmt.Errorf("error response parse failed: status %d", req.StatusCode())
+		}
+		return nil, &TaskError{Information: errorResp.Error}
+	}
+	taskResp := req.Result().(*TaskResponse[EntitiesResult])
+	if taskResp == nil {
+		return nil, fmt.Errorf("task response parse failed: status %d", req.StatusCode())
+	}
+	return &taskResp.Results, nil
 }
 
 func (c client) AnalyzeTextLanguageDetection(ctx context.Context, input LanguageDetectionAnalysisInput, parameters LanguageDetectionTaskParameters) (*LanguageDetectionResult, error) {

@@ -50,6 +50,14 @@ type KeyPhraseTaskParameters struct {
 	ModelVersion  string `json:"modelVersion,omitempty"`
 }
 
+type SentimentAnalysisTaskParameters struct {
+	LoggingOptOut bool   `json:"loggingOptOut,omitempty"`
+	ModelVersion  string `json:"modelVersion,omitempty"`
+	OpinionMining bool   `json:"opinionMining,omitempty"`
+	// StringIndexType Specifies the method used to interpret string offsets. Defaults to Text Elements (Graphemes) according to Unicode v8.0.0. For additional information see https://aka.ms/text-analytics-offsets.
+	StringIndexType string `json:"stringIndexType,omitempty"`
+}
+
 type InputError struct {
 	// Error Error encountered.
 	Error ErrorInformation `json:"error"`
@@ -156,6 +164,15 @@ type EntitiesResult struct {
 }
 
 type KeyPhraseResult struct {
+	// Documents Response by document
+	Documents []Documents `json:"documents"`
+	// Errors Errors by document id.
+	Errors []DocumentError `json:"errors"`
+	// ModelVersion This field indicates which model is used for scoring.
+	ModelVersion string `json:"modelVersion"`
+}
+
+type SentimentResponse struct {
 	// Documents Response by document
 	Documents []Documents `json:"documents"`
 	// Errors Errors by document id.

@@ -12,12 +12,67 @@ type Client interface {
 	AnalyzeTextEntityRecognition(ctx context.Context, input MultiLanguageAnalysisInput, parameters EntitiesTaskParameters) (*EntitiesResult, error)
 	AnalyzeTextKeyPhraseExtraction(ctx context.Context, input MultiLanguageAnalysisInput, parameters KeyPhraseTaskParameters) (*KeyPhraseResult, error)
 	AnalyzeTextSentimentAnalysis(ctx context.Context, input MultiLanguageAnalysisInput, parameters SentimentAnalysisTaskParameters) (*SentimentResponse, error)
+	SubmitTextAnalyticsJob(ctx context.Context, input SubmitJobRequestBody) (string, error)
+	GetTextAnalyticsJobResult(ctx context.Context, jobID string) (*JobStatusResponse, error)
 }
 
 var _ Client = (*client)(nil)
 
 type client struct {
 	r *resty.Client
+}
+
+func (c client) SubmitTextAnalyticsJob(ctx context.Context, input SubmitJobRequestBody) (string, error) {
+	req, err := c.r.R().
+		SetContext(ctx).
+		SetQueryParam("api-version", APIVersion).
+		SetBody(input).
+		SetError(ErrorResponse{}).
+		Post(SubmitJobAPIPath)
+	if err != nil {
+		return "", err
+	}
+	if req.IsError() {
+		errorResp := req.Error().(*ErrorResponse)
+		if errorResp == nil {
+			return "", fmt.Errorf("error response parse failed: status %d", req.StatusCode())
+		}
+		return "", &TaskError{Information: errorResp.Error}
+	}
+	jobLocation := req.Header().Get("Operation-Location")
+	if jobLocation == "" {
+		return "", fmt.Errorf("missing Operation-Location: status %d", req.StatusCode())
+	}
+	jobID, err := ParseJobID(jobLocation)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse jobID: %w", err)
+	}
+	return jobID, nil
+}
+
+func (c client) GetTextAnalyticsJobResult(ctx context.Context, jobID string) (*JobStatusResponse, error) {
+	req, err := c.r.R().
+		SetContext(ctx).
+		SetQueryParam("api-version", APIVersion).
+		SetPathParam("jobId", jobID).
+		SetResult(JobStatusResponse{}).
+		SetError(ErrorResponse{}).
+		Get(JobStatusAPIPath)
+	if err != nil {
+		return nil, err
+	}
+	if req.IsError() {
+		errorResp := req.Error().(*ErrorResponse)
+		if errorResp == nil {
+			return nil, fmt.Errorf("error response parse failed: status %d", req.StatusCode())
+		}
+		return nil, &TaskError{Information: errorResp.Error}
+	}
+	jobResp := req.Result().(*JobStatusResponse)
+	if jobResp == nil {
+		return nil, fmt.Errorf("job response parse failed: status %d", req.StatusCode())
+	}
+	return jobResp, nil
 }
 
 func (c client) AnalyzeTextSentimentAnalysis(ctx context.Context, input MultiLanguageAnalysisInput, parameters SentimentAnalysisTaskParameters) (*SentimentResponse, error) {
@@ -32,7 +87,7 @@ func (c client) AnalyzeTextSentimentAnalysis(ctx context.Context, input MultiLan
 		SetBody(body).
 		SetResult(TaskResponse[SentimentResponse]{}).
 		SetError(ErrorResponse{}).
-		Post(APIPath)
+		Post(AnalyzeTextAPIPath)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +117,7 @@ func (c client) AnalyzeTextKeyPhraseExtraction(ctx context.Context, input MultiL
 		SetBody(body).
 		SetResult(TaskResponse[KeyPhraseResult]{}).
 		SetError(ErrorResponse{}).
-		Post(APIPath)
+		Post(AnalyzeTextAPIPath)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +147,7 @@ func (c client) AnalyzeTextEntityRecognition(ctx context.Context, input MultiLan
 		SetBody(body).
 		SetResult(TaskResponse[EntitiesResult]{}).
 		SetError(ErrorResponse{}).
-		Post(APIPath)
+		Post(AnalyzeTextAPIPath)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +177,7 @@ func (c client) AnalyzeTextLanguageDetection(ctx context.Context, input Language
 		SetBody(body).
 		SetResult(TaskResponse[LanguageDetectionResult]{}).
 		SetError(ErrorResponse{}).
-		Post(APIPath)
+		Post(AnalyzeTextAPIPath)
 	if err != nil {
 		return nil, err
 	}

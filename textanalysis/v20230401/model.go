@@ -58,6 +58,26 @@ type SentimentAnalysisTaskParameters struct {
 	StringIndexType string `json:"stringIndexType,omitempty"`
 }
 
+type ExtractiveSummarizationTaskParameters struct {
+	LoggingOptOut bool   `json:"loggingOptOut,omitempty"`
+	ModelVersion  string `json:"modelVersion,omitempty"`
+	SentenceCount int    `json:"sentenceCount,omitempty"`
+	// SortBy The sorting criteria to use for the results of Extractive Summarization.
+	// "Offset" (Default): Indicates that results should be sorted in order of appearance in the text.
+	// "Rank": Indicates that results should be sorted in order of importance (i.e. rank score) according to the model.
+	SortBy string `json:"sortBy,omitempty"`
+	// StringIndexType Specifies the method used to interpret string offsets. Defaults to Text Elements (Graphemes) according to Unicode v8.0.0. For additional information see https://aka.ms/text-analytics-offsets.
+	StringIndexType string `json:"stringIndexType,omitempty"`
+}
+
+type AbstractiveSummarizationTaskParameters struct {
+	LoggingOptOut bool   `json:"loggingOptOut,omitempty"`
+	ModelVersion  string `json:"modelVersion,omitempty"`
+	SentenceCount int    `json:"sentenceCount,omitempty"`
+	// StringIndexType Specifies the method used to interpret string offsets. Defaults to Text Elements (Graphemes) according to Unicode v8.0.0. For additional information see https://aka.ms/text-analytics-offsets.
+	StringIndexType string `json:"stringIndexType,omitempty"`
+}
+
 type InputError struct {
 	// Error Error encountered.
 	Error ErrorInformation `json:"error"`
@@ -175,6 +195,67 @@ type KeyPhraseResult struct {
 type SentimentResponse struct {
 	// Documents Response by document
 	Documents []Documents `json:"documents"`
+	// Errors Errors by document id.
+	Errors []DocumentError `json:"errors"`
+	// ModelVersion This field indicates which model is used for scoring.
+	ModelVersion string `json:"modelVersion"`
+}
+
+type SummaryContext struct {
+	// Length The length of the context. Use of different 'stringIndexType' values can affect the length returned.
+	Length int `json:"length"`
+	// Offset Start position for the context. Use of different 'stringIndexType' values can affect the offset returned.
+	Offset int `json:"offset"`
+}
+
+type AbstractiveSummary struct {
+	// Contexts The context list of the summary.
+	Contexts []SummaryContext `json:"contexts"`
+	// Text The text of the summary.
+	Text string `json:"text"`
+}
+
+type AbstractiveSummaryDocumentResult struct {
+	// ID Unique, non-empty document identifier.
+	ID string `json:"id"`
+	// Summaries A list of abstractive summaries.
+	Summaries []AbstractiveSummary `json:"summaries"`
+	// Warnings Warnings encountered while processing document.
+	Warnings []DocumentWarning `json:"warnings"`
+}
+
+type AbstractiveSummarizationResult struct {
+	// Documents Response by document
+	Documents []AbstractiveSummaryDocumentResult `json:"documents"`
+	// Errors Errors by document id.
+	Errors []DocumentError `json:"errors"`
+	// ModelVersion This field indicates which model is used for scoring.
+	ModelVersion string `json:"modelVersion"`
+}
+
+type ExtractedSummarySentence struct {
+	// Length The length of the sentence.
+	Length int `json:"length"`
+	// Offset The sentence offset from the start of the document, based on the value of the parameter StringIndexType.
+	Offset int `json:"offset"`
+	// RankScore A double value representing the relevance of the sentence within the summary. Higher values indicate higher importance.
+	RankScore float64 `json:"rankScore"`
+	// Text The extracted sentence text.
+	Text string `json:"text"`
+}
+
+type ExtractedSummaryDocumentResult struct {
+	// ID Unique, non-empty document identifier.
+	ID string `json:"id"`
+	// Sentences A ranked list of sentences representing the extracted summary.
+	Sentences []ExtractedSummarySentence `json:"sentences"`
+	// Warnings Warnings encountered while processing document.
+	Warnings []DocumentWarning `json:"warnings"`
+}
+
+type ExtractiveSummarizationResult struct {
+	// Documents Response by document
+	Documents []ExtractedSummaryDocumentResult `json:"documents"`
 	// Errors Errors by document id.
 	Errors []DocumentError `json:"errors"`
 	// ModelVersion This field indicates which model is used for scoring.

@@ -122,7 +122,7 @@ type DetectedLanguage struct {
 	// Name Long name of a detected language (e.g. English, French).
 	Name string `json:"name"`
 	// Script Identifies the script of the input document.
-	Script string `json:"script"`
+	//Script string `json:"script"`
 }
 
 type LanguageDetectionDocumentResult struct {
@@ -165,7 +165,7 @@ type Entity struct {
 	Text string `json:"text"`
 }
 
-type Documents struct {
+type EntityRecognizedDocument struct {
 	// Entities Recognized entities in the document.
 	Entities []Entity `json:"entities"`
 	// ID Unique, non-empty document identifier.
@@ -174,9 +174,40 @@ type Documents struct {
 	Warnings []DocumentWarning `json:"warnings"`
 }
 
+type KeyPhrasesExtractedDocument struct {
+	// ID Unique, non-empty document identifier.
+	ID string `json:"id"`
+	// Warnings Warnings encountered while processing document.
+	Warnings   []DocumentWarning `json:"warnings"`
+	KeyPhrases []string          `json:"keyPhrases"`
+}
+
+type SentimentConfidenceScores struct {
+	Positive float64 `json:"positive"`
+	Negative float64 `json:"negative"`
+	Neutral  float64 `json:"neutral"`
+}
+
+type SentenceSentiment struct {
+	Sentiment        Sentiment                 `json:"sentiment"`
+	ConfidenceScores SentimentConfidenceScores `json:"confidenceScores"`
+	Offset           int                       `json:"offset"`
+	Length           int                       `json:"length"`
+	Text             string                    `json:"text"`
+}
+
+type SentimentAnalyzedDocument struct {
+	// ID Unique, non-empty document identifier.
+	ID               string                    `json:"id"`
+	Sentiment        Sentiment                 `json:"sentiment"`
+	ConfidenceScores SentimentConfidenceScores `json:"confidenceScores"`
+	Sentences        []SentenceSentiment       `json:"sentences"`
+	Warnings         []DocumentWarning         `json:"warnings"`
+}
+
 type EntitiesResult struct {
 	// Documents Response by document
-	Documents []Documents `json:"documents"`
+	Documents []EntityRecognizedDocument `json:"documents"`
 	// Errors Errors by document id.
 	Errors []DocumentError `json:"errors"`
 	// ModelVersion This field indicates which model is used for scoring.
@@ -185,7 +216,7 @@ type EntitiesResult struct {
 
 type KeyPhraseResult struct {
 	// Documents Response by document
-	Documents []Documents `json:"documents"`
+	Documents []KeyPhrasesExtractedDocument `json:"documents"`
 	// Errors Errors by document id.
 	Errors []DocumentError `json:"errors"`
 	// ModelVersion This field indicates which model is used for scoring.
@@ -194,7 +225,7 @@ type KeyPhraseResult struct {
 
 type SentimentResponse struct {
 	// Documents Response by document
-	Documents []Documents `json:"documents"`
+	Documents []SentimentAnalyzedDocument `json:"documents"`
 	// Errors Errors by document id.
 	Errors []DocumentError `json:"errors"`
 	// ModelVersion This field indicates which model is used for scoring.

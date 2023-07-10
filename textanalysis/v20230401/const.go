@@ -15,3 +15,12 @@ const (
 	TaskKindExtractiveSummarization  TaskKind = "ExtractiveSummarization"
 	TaskKindAbstractiveSummarization TaskKind = "AbstractiveSummarization"
 )
+
+type Sentiment string
+
+const (
+	SentimentPositive Sentiment = "positive"
+	SentimentNeutral  Sentiment = "neutral"
+	SentimentNegative Sentiment = "negative"
+	SentimentMixed    Sentiment = "mixed"
+)

@@ -22,7 +22,7 @@ type client struct {
 
 func (c client) AnalyzeTextSentimentAnalysis(ctx context.Context, input MultiLanguageAnalysisInput, parameters SentimentAnalysisTaskParameters) (*SentimentResponse, error) {
 	body := RequestBody[MultiLanguageAnalysisInput, SentimentAnalysisTaskParameters]{
-		Kind:          "KeyPhraseExtraction",
+		Kind:          TaskKindSentimentAnalysis,
 		AnalysisInput: input,
 		Parameters:    parameters,
 	}
@@ -52,7 +52,7 @@ func (c client) AnalyzeTextSentimentAnalysis(ctx context.Context, input MultiLan
 
 func (c client) AnalyzeTextKeyPhraseExtraction(ctx context.Context, input MultiLanguageAnalysisInput, parameters KeyPhraseTaskParameters) (*KeyPhraseResult, error) {
 	body := RequestBody[MultiLanguageAnalysisInput, KeyPhraseTaskParameters]{
-		Kind:          "KeyPhraseExtraction",
+		Kind:          TaskKindKeyPhraseExtraction,
 		AnalysisInput: input,
 		Parameters:    parameters,
 	}
@@ -82,7 +82,7 @@ func (c client) AnalyzeTextKeyPhraseExtraction(ctx context.Context, input MultiL
 
 func (c client) AnalyzeTextEntityRecognition(ctx context.Context, input MultiLanguageAnalysisInput, parameters EntitiesTaskParameters) (*EntitiesResult, error) {
 	body := RequestBody[MultiLanguageAnalysisInput, EntitiesTaskParameters]{
-		Kind:          "EntityRecognition",
+		Kind:          TaskKindEntityRecognition,
 		AnalysisInput: input,
 		Parameters:    parameters,
 	}
@@ -112,7 +112,7 @@ func (c client) AnalyzeTextEntityRecognition(ctx context.Context, input MultiLan
 
 func (c client) AnalyzeTextLanguageDetection(ctx context.Context, input LanguageDetectionAnalysisInput, parameters LanguageDetectionTaskParameters) (*LanguageDetectionResult, error) {
 	body := RequestBody[LanguageDetectionAnalysisInput, LanguageDetectionTaskParameters]{
-		Kind:          "LanguageDetection",
+		Kind:          TaskKindLanguageDetection,
 		AnalysisInput: input,
 		Parameters:    parameters,
 	}

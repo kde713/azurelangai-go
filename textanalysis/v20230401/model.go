@@ -2,7 +2,7 @@ package v20230401
 
 type RequestBody[AnalysisInput any, Parameters any] struct {
 	// Kind Enumeration of supported Text Analysis tasks.
-	Kind          string        `json:"kind"`
+	Kind          TaskKind      `json:"kind"`
 	AnalysisInput AnalysisInput `json:"analysisInput"`
 	// Parameters Supported parameters for requesting analysis task.
 	Parameters Parameters `json:"parameters"`
@@ -90,8 +90,8 @@ type ErrorResponse struct {
 
 type TaskResponse[Results any] struct {
 	// Kind Enumeration of supported Text Analysis task results.
-	Kind    string  `json:"kind"`
-	Results Results `json:"results"`
+	Kind    TaskKind `json:"kind"`
+	Results Results  `json:"results"`
 }
 
 type DetectedLanguage struct {

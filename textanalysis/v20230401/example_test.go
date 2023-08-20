@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	azuretextanalysis "github.com/kde713/azurelangai-go/textanalysis/v20230401"
 )
@@ -16,7 +17,11 @@ func ExampleNewClient() {
 	key := "<this-is-example>"
 
 	// Create a client.
-	azureTextAnalysisClient = azuretextanalysis.NewClient(endpoint, key)
+	azureTextAnalysisClient = azuretextanalysis.NewClient(
+		endpoint,
+		key,
+		azuretextanalysis.WithRetryCount(3, 5*time.Second, 20*time.Second),
+	)
 }
 
 func ExampleClient_AnalyzeTextLanguageDetection() {

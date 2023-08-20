@@ -3,6 +3,7 @@ package v20230401
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -195,8 +196,24 @@ func (c client) AnalyzeTextLanguageDetection(ctx context.Context, input Language
 	return &taskResp.Results, nil
 }
 
-func NewClient(endpoint string, key string) Client {
+func NewClient(endpoint string, key string, optAppliers ...Option) Client {
+	o := options{}
+	for _, applier := range optAppliers {
+		applier(&o)
+	}
+
+	r := resty.New().SetBaseURL(endpoint).SetHeader("Ocp-Apim-Subscription-Key", key)
+
+	// Handle retry option
+	if o.retryCount != 0 {
+		r = r.SetRetryCount(o.retryCount).SetRetryWaitTime(o.retryWaitTime).SetRetryMaxWaitTime(o.retryMaxWaitTime)
+		r = r.AddRetryCondition(func(r *resty.Response, err error) bool {
+			statusCode := r.StatusCode()
+			return statusCode == http.StatusTooManyRequests || statusCode == http.StatusInternalServerError || statusCode == http.StatusBadGateway || statusCode == http.StatusServiceUnavailable
+		})
+	}
+
 	return &client{
-		r: resty.New().SetBaseURL(endpoint).SetHeader("Ocp-Apim-Subscription-Key", key),
+		r: r,
 	}
 }
